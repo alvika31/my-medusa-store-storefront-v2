@@ -7,7 +7,6 @@ import Spinner from "@modules/common/icons/spinner"
 import { Disclosure } from "@headlessui/react"
 import clsx from "clsx"
 import { useCreateWishlistName } from "@lib/hooks/use-create-wishlist-name"
-import { Region } from "@medusajs/medusa"
 
 interface FormValues {
   title: string
@@ -15,10 +14,9 @@ interface FormValues {
 }
 
 interface Props {
-  regions: Region[] | any
   refetch: any
 }
-const WishlistAdd: React.FC<Props> = ({ regions, refetch }) => {
+const WishlistAdd: React.FC<Props> = ({ refetch }) => {
   const [isSuccess, setIsSuccess] = useState(false)
   const { customer } = useMeCustomer()
   const id = customer?.id
@@ -30,16 +28,9 @@ const WishlistAdd: React.FC<Props> = ({ regions, refetch }) => {
   } = useForm<FormValues>()
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    const regionId = regions?.[0]?.id
-    if (!regionId) {
-      console.error("Region ID not found in the API response")
-      return null
-    }
-
     const payload = {
       title: data.title,
       customer_id: id,
-      region_id: regionId,
     }
 
     mutate(payload)

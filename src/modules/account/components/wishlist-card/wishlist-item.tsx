@@ -2,19 +2,17 @@ import Image from "next/image"
 import Trash from "@modules/common/icons/trash"
 import React, { useState } from "react"
 import LineItemOptions from "@modules/common/components/line-item-options"
-import LineItemPrice from "@modules/common/components/line-item-price"
-import NativeSelect from "@modules/common/components/native-select"
 import { useDeleteWishlistItem } from "@lib/hooks/use-delete-wishlist-item"
 import { Disclosure } from "@headlessui/react"
 import clsx from "clsx"
-import { ProductVariant } from "@medusajs/medusa"
+import { useRegions } from "medusa-react"
 import { formatAmount } from "medusa-react"
 
-const WishlistItem = ({ wishlist, region, refetch }: any) => {
+const WishlistItem = ({ wishlist, refetch }: any) => {
   const [isSuccess, setIsSuccess] = useState<
     { type: string; status: boolean } | undefined
   >(undefined)
-
+  const { regions } = useRegions()
   const { mutate: deleteWishlist } = useDeleteWishlistItem({
     onSuccess: () => {
       refetch()
@@ -92,16 +90,20 @@ const WishlistItem = ({ wishlist, region, refetch }: any) => {
                     </p>
                     <LineItemOptions variant={item?.variant} />
 
-                    {item.variant?.prices.map((price: any, index: string) => {
+                    {item.variant?.prices.map((price: any, index: number) => {
+                      const matchingRegion = regions?.find(
+                        (region) => region.currency_code === price.currency_code
+                      )
                       return (
                         <div key={index}>
                           <p className="text-small-regular text-gray-700">
                             Unit Price:{" "}
-                            {formatAmount({
-                              amount: price.amount || 0,
-                              region: region,
-                              includeTaxes: false,
-                            })}
+                            {matchingRegion &&
+                              formatAmount({
+                                amount: price.amount || 0,
+                                region: matchingRegion,
+                                includeTaxes: false,
+                              })}
                           </p>
                         </div>
                       )

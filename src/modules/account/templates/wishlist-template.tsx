@@ -5,14 +5,12 @@ import { useMeCustomer } from "medusa-react"
 import Spinner from "@modules/common/icons/spinner"
 import WishlistCard from "../components/wishlist-card"
 import { useEffect } from "react"
-import { useRegions } from "medusa-react"
 
 const WishlistTemplate = () => {
   const { customer } = useMeCustomer()
   const id = customer?.id
 
   const { data, isLoading, refetch } = useFetchWishlist(id)
-  const { regions, isLoading: regionLoading } = useRegions()
 
   useEffect(() => {
     refetch()
@@ -26,7 +24,7 @@ const WishlistTemplate = () => {
       </div>
       <div className="flex flex-col mb-5">
         <h3 className="text-large-semi mb-3">Create Wishlist</h3>
-        <WishlistAdd regions={regions} refetch={refetch} />
+        <WishlistAdd refetch={refetch} />
       </div>
       {isLoading && (
         <div className="z-10 fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center">

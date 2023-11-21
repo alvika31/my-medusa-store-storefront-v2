@@ -43,7 +43,6 @@ const WishlistItemAdd = ({
     try {
       const wishlistNameId = data.wishlist_name_id
       const payload = {
-        product_id: product.id,
         variant_id: variant?.id,
       }
 

@@ -14,7 +14,6 @@ import Spinner from "@modules/common/icons/spinner"
 import WishlistItem from "./wishlist-item"
 import Link from "next/link"
 import { useUpdateWishlist } from "@lib/hooks/use-update-wishlist"
-import { formatAmount } from "medusa-react"
 
 type FormValues = {
   title: string
@@ -130,7 +129,6 @@ const WishlistCard = ({ wishlist, refetch }: any) => {
             id: string
             title: string
             wishlists: any
-            region: any
             total: number
           },
           index: number
@@ -165,11 +163,7 @@ const WishlistCard = ({ wishlist, refetch }: any) => {
                 </button>
               </div>
             </div>
-            <WishlistItem
-              wishlist={item.wishlists}
-              region={item.region}
-              refetch={refetch}
-            />
+            <WishlistItem wishlist={item.wishlists} refetch={refetch} />
             {item.wishlists.length === 0 && (
               <div className="bg-red-200 text-red-500 p-3 rounded">
                 Wishlist Items Is Empty
