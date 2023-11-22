@@ -60,117 +60,93 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({
   const { mutate: updateWishlistMutation } = useUpdateWishlist()
 
   const addWishlistName = async ({ title, customer_id }: VariantInfoProps) => {
-    try {
-      await createWishlistNameMutation.mutate(
-        { title, customer_id },
-        {
-          onSuccess: () => {
-            refetch()
+    await createWishlistNameMutation.mutate(
+      { title, customer_id },
+      {
+        onSuccess: () => {
+          refetch()
+          setIsSuccess({
+            type: "create",
+            status: true,
+          })
+          setTimeout(() => {
             setIsSuccess({
               type: "create",
-              status: true,
+              status: false,
             })
-            setTimeout(() => {
-              setIsSuccess({
-                type: "create",
-                status: false,
-              })
-            }, 2000)
-          },
-        }
-      )
-    } catch (error) {
-      console.error(error)
-      setIsSuccess({
-        type: "create",
-        status: false,
-      })
-    }
+          }, 2000)
+        },
+      }
+    )
   }
 
   const onDeleteWishlistName = async ({ id }: wishlistInfoProps) => {
-    try {
-      await deleteWishlistNameMutation(id, {
-        onSuccess: () => {
-          refetch()
-          setIsSuccess({
-            type: "delete",
-            status: true,
-          })
-          setTimeout(() => {
-            setIsSuccess({
-              type: "delete",
-              status: false,
-            })
-          }, 2000)
-        },
-        onError: (error: any) => {
+    await deleteWishlistNameMutation(id, {
+      onSuccess: () => {
+        refetch()
+        setIsSuccess({
+          type: "delete",
+          status: true,
+        })
+        setTimeout(() => {
           setIsSuccess({
             type: "delete",
             status: false,
           })
-        },
-      })
-    } catch (error) {
-      console.log(error)
-    }
+        }, 2000)
+      },
+      onError: (error: any) => {
+        setIsSuccess({
+          type: "delete",
+          status: false,
+        })
+      },
+    })
   }
   const onDeleteWishlisItem = async ({ id }: wishlistItemInfoProps) => {
-    try {
-      await deleteWishlistItemMutation(id, {
-        onSuccess: () => {
-          refetch()
-          setIsSuccess({
-            type: "delete-item",
-            status: true,
-          })
-          setTimeout(() => {
-            setIsSuccess({
-              type: "delete-item",
-              status: false,
-            })
-          }, 2000)
-        },
-        onError: (error: any) => {
+    await deleteWishlistItemMutation(id, {
+      onSuccess: () => {
+        refetch()
+        setIsSuccess({
+          type: "delete-item",
+          status: true,
+        })
+        setTimeout(() => {
           setIsSuccess({
             type: "delete-item",
             status: false,
           })
-        },
-      })
-    } catch (error) {
-      console.log(error)
-    }
+        }, 2000)
+      },
+      onError: (error: any) => {
+        setIsSuccess({
+          type: "delete-item",
+          status: false,
+        })
+      },
+    })
   }
 
   const onUpdateWishlistName = async ({ id, title }: UpdateInfoProps) => {
-    try {
-      await updateWishlistMutation(
-        { id, title },
-        {
-          onSuccess: () => {
-            refetch()
+    await updateWishlistMutation(
+      { id, title },
+      {
+        onSuccess: () => {
+          refetch()
+          setIsSuccess({
+            type: "update",
+            status: true,
+          })
+
+          setTimeout(() => {
             setIsSuccess({
               type: "update",
-              status: true,
+              status: false,
             })
-
-            setTimeout(() => {
-              setIsSuccess({
-                type: "update",
-                status: false,
-              })
-            }, 2000)
-          },
-        }
-      )
-    } catch (error) {
-      console.error(error)
-      setIsSuccess({
-        type: "update",
-        status: false,
-      })
-    }
+          }, 2000)
+        },
+      }
+    )
   }
 
   return (

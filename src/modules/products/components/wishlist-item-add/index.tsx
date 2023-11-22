@@ -1,12 +1,10 @@
 import Modal from "@modules/common/components/modal"
 import Button from "@modules/common/components/button"
-import Spinner from "@modules/common/icons/spinner"
 import NativeSelect from "@modules/common/components/native-select"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
-import { useState } from "react"
-import { useCreateWishlistItem } from "@lib/hooks/use-create-wishlist-item"
 import { useFetchWishlist } from "@lib/hooks/use-wishlist"
+import { useProductActions } from "@lib/context/product-context"
 
 type WishlistItemAddProps = {
   isOpen: boolean
@@ -19,8 +17,7 @@ interface FormValues {
 }
 
 const WishlistItemAdd = ({ isOpen, close, variant }: WishlistItemAddProps) => {
-  const [submitting, setSubmitting] = useState(false)
-  const { data: wishlist, refetch: refetchWishlist } = useFetchWishlist()
+  const { data: wishlist } = useFetchWishlist()
   const {
     register,
     handleSubmit,
@@ -28,42 +25,19 @@ const WishlistItemAdd = ({ isOpen, close, variant }: WishlistItemAddProps) => {
     reset,
   } = useForm<FormValues>()
 
-  const { mutate } = useCreateWishlistItem()
+  const { onCreateWishlistItem } = useProductActions()
 
   const onSubmit = async (data: any) => {
-    try {
-      const wishlistNameId = data.wishlist_name_id
-      const payload = {
-        variant_id: variant?.id,
-      }
-
-      await mutate(
-        { payload, wishlistNameId },
-        {
-          onSuccess: () => {
-            reset()
-            refetchWishlist()
-            close()
-            alert("Product successfully added to wishlist")
-            setSubmitting(false)
-          },
-          onError: (error: any) => {
-            reset()
-            if (
-              error?.response?.status === 400 &&
-              error?.response?.data?.message === "Wishlist already exists"
-            ) {
-              alert("Wishlist already exists")
-            } else {
-              alert("Failed to add product to wishlist")
-              console.log(error)
-            }
-          },
-        }
-      )
-    } catch (error) {
-      console.error(error)
+    const wishlistNameId = data.wishlist_name_id
+    const payload = {
+      variant_id: variant?.id,
     }
+    onCreateWishlistItem({
+      wishlist_name_id: wishlistNameId,
+      variant_id: payload.variant_id,
+    })
+    reset()
+    close()
   }
 
   return (
@@ -90,10 +64,7 @@ const WishlistItemAdd = ({ isOpen, close, variant }: WishlistItemAddProps) => {
                   </option>
                 ))}
             </NativeSelect>
-            <Button disabled={submitting}>
-              Save
-              {submitting && <Spinner />}
-            </Button>
+            <Button>Save</Button>
           </form>
           <Link
             href="/account/wishlist"

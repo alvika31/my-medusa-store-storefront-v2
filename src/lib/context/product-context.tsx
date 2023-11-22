@@ -14,7 +14,14 @@ import React, {
 import { Variant } from "types/medusa"
 import { useStore } from "./store-context"
 import { PricedProduct } from "@medusajs/medusa/dist/types/pricing"
+import { useCreateWishlistItem } from "@lib/hooks/use-create-wishlist-item"
+import { useFetchWishlist } from "@lib/hooks/use-wishlist"
+import { error } from "console"
 
+interface wishlistItemInfoProps {
+  wishlist_name_id: string
+  variant_id: string
+}
 interface ProductContext {
   formattedPrice: string
   quantity: number
@@ -27,6 +34,7 @@ interface ProductContext {
   increaseQuantity: () => void
   decreaseQuantity: () => void
   addToCart: () => void
+  onCreateWishlistItem: (item: wishlistItemInfoProps) => void
 }
 
 const ProductActionContext = createContext<ProductContext | null>(null)
@@ -44,10 +52,11 @@ export const ProductProvider = ({
   const [options, setOptions] = useState<Record<string, string>>({})
   const [maxQuantityMet, setMaxQuantityMet] = useState<boolean>(false)
   const [inStock, setInStock] = useState<boolean>(true)
-
+  const { mutate: createWishlistItemMutation } = useCreateWishlistItem()
   const { addItem } = useStore()
   const { cart } = useCart()
   const variants = product.variants as unknown as Variant[]
+  const { refetch } = useFetchWishlist()
 
   useEffect(() => {
     // initialize the option state
@@ -150,6 +159,32 @@ export const ProductProvider = ({
     }
   }
 
+  const onCreateWishlistItem = async ({
+    wishlist_name_id,
+    variant_id,
+  }: wishlistItemInfoProps) => {
+    await createWishlistItemMutation(
+      { wishlist_name_id, variant_id },
+      {
+        onSuccess: () => {
+          alert("Product successfully added to wishlist")
+          refetch()
+        },
+        onError: (error: any) => {
+          if (
+            error?.response?.status === 400 &&
+            error?.response?.data?.message === "Wishlist already exists"
+          ) {
+            alert("Wishlist already exists")
+          } else {
+            alert("Failed to add product to wishlist")
+            console.log(error)
+          }
+        },
+      }
+    )
+  }
+
   return (
     <ProductActionContext.Provider
       value={{
@@ -164,6 +199,7 @@ export const ProductProvider = ({
         decreaseQuantity,
         increaseQuantity,
         formattedPrice,
+        onCreateWishlistItem,
       }}
     >
       {children}
