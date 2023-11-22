@@ -10,8 +10,6 @@ import ImageGallery from "@modules/products/components/image-gallary"
 import MobileActions from "@modules/products/components/mobile-actions"
 import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
 import { PricedProduct } from "@medusajs/medusa/dist/types/pricing"
-import { useMeCustomer } from "medusa-react"
-import { useFetchWishlist } from "@lib/hooks/use-wishlist"
 
 type ProductTemplateProps = {
   product: PricedProduct
@@ -23,9 +21,6 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
   const info = useRef<HTMLDivElement>(null)
 
   const inView = useIntersection(info, "0px")
-  const { customer } = useMeCustomer()
-  const id = customer?.id
-  const { data, isLoading, refetch } = useFetchWishlist(id)
 
   useEffect(() => {
     const onboarding = window.sessionStorage.getItem("onboarding")
@@ -43,7 +38,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
           ref={info}
         >
           {isOnboarding && <ProductOnboardingCta />}
-          <ProductInfo product={product} wishlist={data} refetch={refetch} />
+          <ProductInfo product={product} />
           <ProductTabs product={product} />
         </div>
       </div>

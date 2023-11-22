@@ -12,18 +12,9 @@ import WishlistItemAdd from "../wishlist-item-add"
 
 type ProductActionsProps = {
   product: PricedProduct
-  wishlist: any
-  refetch: any
 }
 
-interface FormValues {
-  wishlist_name_id: string
-}
-const ProductActions: React.FC<ProductActionsProps> = ({
-  product,
-  wishlist,
-  refetch,
-}) => {
+const ProductActions: React.FC<ProductActionsProps> = ({ product }) => {
   const { updateOptions, addToCart, options, inStock, variant } =
     useProductActions()
 
@@ -42,7 +33,6 @@ const ProductActions: React.FC<ProductActionsProps> = ({
     } else if (!variant) {
       return alert("You Must Select Variant!")
     } else {
-      refetch()
       open()
     }
   }
@@ -114,14 +104,7 @@ const ProductActions: React.FC<ProductActionsProps> = ({
       <Button variant="secondary" onClick={() => addtoWishlistItem()}>
         Add to Wishlist
       </Button>
-      <WishlistItemAdd
-        isOpen={state}
-        close={close}
-        wishlist={wishlist}
-        refetch={refetch}
-        product={product}
-        variant={variant}
-      />
+      <WishlistItemAdd isOpen={state} close={close} variant={variant} />
     </div>
   )
 }

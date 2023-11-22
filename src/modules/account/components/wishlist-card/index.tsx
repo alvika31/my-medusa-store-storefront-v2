@@ -1,7 +1,6 @@
 import Trash from "@modules/common/icons/trash"
 import Edit from "@modules/common/icons/edit"
 import Package from "@modules/common/icons/package"
-import { useDeleteWishlist } from "@lib/hooks/use-delete-wishlist"
 import { useState } from "react"
 import { Disclosure } from "@headlessui/react"
 import clsx from "clsx"
@@ -10,10 +9,9 @@ import { useForm } from "react-hook-form"
 import Button from "@modules/common/components/button"
 import Input from "@modules/common/components/input"
 import Modal from "@modules/common/components/modal"
-import Spinner from "@modules/common/icons/spinner"
 import WishlistItem from "./wishlist-item"
 import Link from "next/link"
-import { useUpdateWishlist } from "@lib/hooks/use-update-wishlist"
+import { useWishlist } from "@lib/context/wishlist-context"
 
 type FormValues = {
   title: string
@@ -21,15 +19,12 @@ type FormValues = {
 const defaultFormValues = {
   title: undefined,
 }
-const WishlistCard = ({ wishlist, refetch }: any) => {
-  const [isSuccess, setIsSuccess] = useState<
-    { type: string; status: boolean } | undefined
-  >(undefined)
+const WishlistCard = ({ wishlist }: any) => {
   const { state, open, close } = useToggleState(false)
   const [id, setId] = useState("")
-  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
-
+  const { isSuccess, onDeleteWishlistName, onUpdateWishlistName } =
+    useWishlist()
   const {
     register,
     handleSubmit,
@@ -45,49 +40,21 @@ const WishlistCard = ({ wishlist, refetch }: any) => {
     open()
   }
 
-  const { mutate: updateWishlist } = useUpdateWishlist({
-    onSuccess: () => {
-      setSubmitting(false)
-      refetch()
-      close()
-      setIsSuccess({ type: "success-update", status: true })
-      setTimeout(() => {
-        setIsSuccess({ type: "success-update", status: false })
-      }, 2000)
-    },
-    onError: (error: any) => {
-      setSubmitting(false)
-      setError("Failed to update wishlist, please try again.")
-      console.log(error)
-    },
-  })
-
   const submit = handleSubmit(async (data: FormValues) => {
-    setSubmitting(true)
     setError(undefined)
 
     const payload = {
       title: data.title,
       id: id,
     }
-
-    updateWishlist(payload)
+    onUpdateWishlistName(payload)
+    close()
   })
 
-  const { mutate: deleteWishlist } = useDeleteWishlist({
-    onSuccess: () => {
-      refetch()
-      setIsSuccess({ type: "success-delete", status: true })
-      setTimeout(() => {
-        setIsSuccess({ type: "success-delete", status: false })
-      }, 2000)
-    },
-  })
-
-  const confirmDeleteWishlist = (wishlist_id: any) => {
-    const shouldDelete = confirm("Are You Sure")
+  const confirmDeleteWishlist = (id: any) => {
+    const shouldDelete = confirm("Are You Sure?")
     if (shouldDelete) {
-      deleteWishlist(wishlist_id)
+      onDeleteWishlistName({ id })
     }
   }
 
@@ -98,7 +65,7 @@ const WishlistCard = ({ wishlist, refetch }: any) => {
           Wishlist Is Empty
         </div>
       )}
-      {isSuccess?.status && (
+      {isSuccess.type === "delete" && isSuccess.status === true && (
         <Disclosure>
           <Disclosure.Panel
             static
@@ -111,14 +78,43 @@ const WishlistCard = ({ wishlist, refetch }: any) => {
             )}
           >
             <div className="bg-green-100 text-green-500 p-4 my-4">
-              <span>
-                {isSuccess?.type === "success-delete" &&
-                  "Wishlist deleted succesfully"}
-              </span>
-              <span>
-                {isSuccess?.type === "success-update" &&
-                  "Wishlist updated succesfully"}
-              </span>
+              <span>Wishlist deleted succesfully</span>
+            </div>
+          </Disclosure.Panel>
+        </Disclosure>
+      )}
+      {isSuccess?.type === "delete-item" && isSuccess?.status === true && (
+        <Disclosure>
+          <Disclosure.Panel
+            static
+            className={clsx(
+              "transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden",
+              {
+                "max-h-[1000px] opacity-100": isSuccess,
+                "max-h-0 opacity-0": !isSuccess,
+              }
+            )}
+          >
+            <div className="bg-green-100 text-green-500 p-4 my-4">
+              <span>Wishlist item deleted succesfully</span>
+            </div>
+          </Disclosure.Panel>
+        </Disclosure>
+      )}
+      {isSuccess.type === "update" && isSuccess.status === true && (
+        <Disclosure>
+          <Disclosure.Panel
+            static
+            className={clsx(
+              "transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden",
+              {
+                "max-h-[1000px] opacity-100": isSuccess,
+                "max-h-0 opacity-0": !isSuccess,
+              }
+            )}
+          >
+            <div className="bg-green-100 text-green-500 p-4 my-4">
+              <span>Wishlist updated succesfully</span>
             </div>
           </Disclosure.Panel>
         </Disclosure>
@@ -163,7 +159,7 @@ const WishlistCard = ({ wishlist, refetch }: any) => {
                 </button>
               </div>
             </div>
-            <WishlistItem wishlist={item.wishlists} refetch={refetch} />
+            <WishlistItem wishlist={item.wishlists} />
             {item.wishlists.length === 0 && (
               <div className="bg-red-200 text-red-500 p-3 rounded">
                 Wishlist Items Is Empty
@@ -194,10 +190,7 @@ const WishlistCard = ({ wishlist, refetch }: any) => {
           <Button variant="secondary" onClick={close}>
             Cancel
           </Button>
-          <Button onClick={submit} disabled={submitting}>
-            Save
-            {submitting && <Spinner />}
-          </Button>
+          <Button onClick={submit}>Update</Button>
         </Modal.Footer>
       </Modal>
     </>

@@ -1,18 +1,22 @@
-import { useMutation } from "@tanstack/react-query"
-import axios from "axios"
+import { useMutation, UseMutationResult } from "@tanstack/react-query"
+import axios, { AxiosResponse } from "axios"
 import { MEDUSA_BACKEND_URL } from "@lib/config"
 
-export const useDeleteWishlist = ({ onSuccess }: any) => {
-  return useMutation({
-    mutationFn: async (id) => {
-      const wishlistResponse = await axios.delete(
-        `${MEDUSA_BACKEND_URL}/store/wishlist/${id}`,
-        {
-          withCredentials: true,
-        }
-      )
-      return wishlistResponse
-    },
-    onSuccess,
-  })
+const deleteWishlistName = async (
+  id: string
+): Promise<AxiosResponse<any, any>> => {
+  const response = await axios.delete(
+    `${MEDUSA_BACKEND_URL}/store/wishlist/${id}`,
+    {
+      withCredentials: true,
+    }
+  )
+  return response
 }
+
+export const useDeleteWishlist = (): UseMutationResult<
+  AxiosResponse<any, any>,
+  unknown,
+  string,
+  unknown
+> => useMutation(deleteWishlistName)

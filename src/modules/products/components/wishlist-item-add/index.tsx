@@ -6,13 +6,11 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { useCreateWishlistItem } from "@lib/hooks/use-create-wishlist-item"
+import { useFetchWishlist } from "@lib/hooks/use-wishlist"
 
 type WishlistItemAddProps = {
   isOpen: boolean
   close: () => void
-  wishlist: any
-  refetch: any
-  product: any
   variant: any
 }
 
@@ -20,16 +18,9 @@ interface FormValues {
   wishlist_name_id: string
 }
 
-const WishlistItemAdd = ({
-  isOpen,
-  close,
-  wishlist,
-  refetch,
-  product,
-  variant,
-}: WishlistItemAddProps) => {
+const WishlistItemAdd = ({ isOpen, close, variant }: WishlistItemAddProps) => {
   const [submitting, setSubmitting] = useState(false)
-
+  const { data: wishlist, refetch: refetchWishlist } = useFetchWishlist()
   const {
     register,
     handleSubmit,
@@ -51,7 +42,7 @@ const WishlistItemAdd = ({
         {
           onSuccess: () => {
             reset()
-            refetch()
+            refetchWishlist()
             close()
             alert("Product successfully added to wishlist")
             setSubmitting(false)

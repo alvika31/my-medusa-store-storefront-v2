@@ -1,23 +1,17 @@
 import Input from "@modules/common/components/input"
 import Button from "@modules/common/components/button"
 import { useForm, SubmitHandler } from "react-hook-form"
-import React, { useState } from "react"
 import { useMeCustomer } from "medusa-react"
-import Spinner from "@modules/common/icons/spinner"
 import { Disclosure } from "@headlessui/react"
 import clsx from "clsx"
-import { useCreateWishlistName } from "@lib/hooks/use-create-wishlist-name"
+import { useWishlist } from "@lib/context/wishlist-context"
 
 interface FormValues {
-  title: string
-  customer_id: string
+  title?: string
+  customer_id?: string
 }
 
-interface Props {
-  refetch: any
-}
-const WishlistAdd: React.FC<Props> = ({ refetch }) => {
-  const [isSuccess, setIsSuccess] = useState(false)
+const WishlistAdd: React.FC = () => {
   const { customer } = useMeCustomer()
   const id = customer?.id
   const {
@@ -26,34 +20,20 @@ const WishlistAdd: React.FC<Props> = ({ refetch }) => {
     formState: { errors },
     reset,
   } = useForm<FormValues>()
+  const { addWishlistName, isSuccess } = useWishlist()
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const payload = {
-      title: data.title,
-      customer_id: id,
+      title: data?.title || "",
+      customer_id: id || "",
     }
-
-    mutate(payload)
+    addWishlistName(payload)
+    reset()
   }
-
-  const { mutate, isLoading: createWishlistNameIsLoading } =
-    useCreateWishlistName({
-      onSuccess: () => {
-        reset()
-        refetch()
-        setIsSuccess(true)
-        setTimeout(() => {
-          setIsSuccess(false)
-        }, 2000)
-      },
-      onError: (error: any) => {
-        console.log(error)
-      },
-    })
 
   return (
     <>
-      {isSuccess && (
+      {isSuccess?.type === "create" && isSuccess?.status === true && (
         <Disclosure>
           <Disclosure.Panel
             static
@@ -84,13 +64,8 @@ const WishlistAdd: React.FC<Props> = ({ refetch }) => {
           errors={errors}
           autoComplete="given-wishlist"
         />
-        <Button
-          type="submit"
-          className="w-full small:max-w-[140px]"
-          disabled={createWishlistNameIsLoading}
-        >
+        <Button type="submit" className="w-full small:max-w-[140px]">
           Save
-          {createWishlistNameIsLoading && <Spinner />}
         </Button>
       </form>
     </>

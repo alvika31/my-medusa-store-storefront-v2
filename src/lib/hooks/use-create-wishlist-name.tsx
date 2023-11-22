@@ -1,22 +1,28 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, UseMutationResult } from "@tanstack/react-query"
+import axios, { AxiosResponse } from "axios"
 import { MEDUSA_BACKEND_URL } from "@lib/config"
-import axios from "axios"
-import { Customer } from "@medusajs/medusa"
-import { useMutation } from "@tanstack/react-query"
 
-export const useCreateWishlistName = ({ onSuccess, onError }: any) => {
-  return useMutation({
-    mutationFn: async (payload: any) => {
-      const response = await axios.post(
-        `${MEDUSA_BACKEND_URL}/store/wishlist`,
-        payload,
-        {
-          withCredentials: true,
-        }
-      )
-      return response
-    },
-    onSuccess,
-    onError,
-  })
+interface Payload {
+  title: string
+  customer_id: string
 }
+
+const createWishlistName = async (
+  payload: Payload
+): Promise<AxiosResponse<any, any>> => {
+  const response = await axios.post(
+    `${MEDUSA_BACKEND_URL}/store/wishlist`,
+    payload,
+    {
+      withCredentials: true,
+    }
+  )
+  return response
+}
+
+export const useCreateWishlistName = (): UseMutationResult<
+  AxiosResponse<any, any>,
+  unknown,
+  Payload,
+  unknown
+> => useMutation(createWishlistName)

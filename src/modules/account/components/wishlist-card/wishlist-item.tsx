@@ -1,61 +1,23 @@
 import Image from "next/image"
 import Trash from "@modules/common/icons/trash"
-import React, { useState } from "react"
+import React from "react"
 import LineItemOptions from "@modules/common/components/line-item-options"
-import { useDeleteWishlistItem } from "@lib/hooks/use-delete-wishlist-item"
-import { Disclosure } from "@headlessui/react"
-import clsx from "clsx"
 import { useRegions } from "medusa-react"
 import { formatAmount } from "medusa-react"
+import { useWishlist } from "@lib/context/wishlist-context"
 
-const WishlistItem = ({ wishlist, refetch }: any) => {
-  const [isSuccess, setIsSuccess] = useState<
-    { type: string; status: boolean } | undefined
-  >(undefined)
+const WishlistItem = ({ wishlist }: any) => {
   const { regions } = useRegions()
-  const { mutate: deleteWishlist } = useDeleteWishlistItem({
-    onSuccess: () => {
-      refetch()
-      setIsSuccess({ type: "success-delete", status: true })
-      setTimeout(() => {
-        setIsSuccess({ type: "success-delete", status: false })
-      }, 2000)
-    },
-  })
+  const { onDeleteWishlisItem } = useWishlist()
 
-  const confirmDeleteWishlistItem = (wishlist_id: any) => {
+  const confirmDeleteWishlistItem = (id: any) => {
     const shouldDelete = confirm("Are You Sure")
     if (shouldDelete) {
-      deleteWishlist(wishlist_id)
+      onDeleteWishlisItem({ id })
     }
   }
   return (
     <div className="my-3">
-      {isSuccess?.status && (
-        <Disclosure>
-          <Disclosure.Panel
-            static
-            className={clsx(
-              "transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden",
-              {
-                "max-h-[1000px] opacity-100": isSuccess,
-                "max-h-0 opacity-0": !isSuccess,
-              }
-            )}
-          >
-            <div className="bg-green-100 text-green-500 p-4 my-4">
-              <span>
-                {isSuccess?.type === "success-delete" &&
-                  "Wishlist item deleted succesfully"}
-              </span>
-              <span>
-                {isSuccess?.type === "success-update" &&
-                  "Wishlist item updated succesfully"}
-              </span>
-            </div>
-          </Disclosure.Panel>
-        </Disclosure>
-      )}
       <p className="text-base-regular font-medium mt-2">Item Wishlist: </p>
 
       {wishlist.map(
