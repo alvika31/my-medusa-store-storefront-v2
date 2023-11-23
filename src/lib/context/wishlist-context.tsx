@@ -8,7 +8,6 @@ import { useDeleteWishlistItem } from "@lib/hooks/use-delete-wishlist-item"
 
 interface VariantInfoProps {
   title: string
-  customer_id: string
 }
 interface wishlistInfoProps {
   id: string
@@ -59,9 +58,9 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({
   const { mutate: deleteWishlistItemMutation } = useDeleteWishlistItem()
   const { mutate: updateWishlistMutation } = useUpdateWishlist()
 
-  const addWishlistName = async ({ title, customer_id }: VariantInfoProps) => {
+  const addWishlistName = async ({ title }: VariantInfoProps) => {
     await createWishlistNameMutation.mutate(
-      { title, customer_id },
+      { title },
       {
         onSuccess: () => {
           refetch()

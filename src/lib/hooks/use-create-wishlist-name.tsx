@@ -4,7 +4,6 @@ import { MEDUSA_BACKEND_URL } from "@lib/config"
 
 interface Payload {
   title: string
-  customer_id: string
 }
 
 const createWishlistName = async (

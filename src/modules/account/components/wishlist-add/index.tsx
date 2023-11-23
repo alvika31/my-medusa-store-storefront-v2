@@ -1,19 +1,15 @@
 import Input from "@modules/common/components/input"
 import Button from "@modules/common/components/button"
 import { useForm, SubmitHandler } from "react-hook-form"
-import { useMeCustomer } from "medusa-react"
 import { Disclosure } from "@headlessui/react"
 import clsx from "clsx"
 import { useWishlist } from "@lib/context/wishlist-context"
 
 interface FormValues {
   title?: string
-  customer_id?: string
 }
 
 const WishlistAdd: React.FC = () => {
-  const { customer } = useMeCustomer()
-  const id = customer?.id
   const {
     register,
     handleSubmit,
@@ -25,7 +21,6 @@ const WishlistAdd: React.FC = () => {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const payload = {
       title: data?.title || "",
-      customer_id: id || "",
     }
     addWishlistName(payload)
     reset()
