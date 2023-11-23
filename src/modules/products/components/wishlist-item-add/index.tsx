@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { useFetchWishlist } from "@lib/hooks/use-wishlist"
 import { useProductActions } from "@lib/context/product-context"
+import React from "react"
 
 type WishlistItemAddProps = {
   isOpen: boolean
@@ -18,12 +19,15 @@ interface FormValues {
 
 const WishlistItemAdd = ({ isOpen, close, variant }: WishlistItemAddProps) => {
   const { data: wishlist } = useFetchWishlist()
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<FormValues>()
+  const selectWishlistName = watch("wishlist_name_id")
 
   const { onCreateWishlistItem } = useProductActions()
 
@@ -40,8 +44,33 @@ const WishlistItemAdd = ({ isOpen, close, variant }: WishlistItemAddProps) => {
     close()
   }
 
+  const isProductInWishlist = () => {
+    if (!wishlist?.wishlist) return false
+
+    for (const item of wishlist?.wishlist) {
+      const matchingWishlistItems = item.wishlists.filter(
+        (wishlistitem: any) =>
+          wishlistitem.variant_id === variant?.id &&
+          wishlistitem.wishlist_name_id === selectWishlistName
+      )
+
+      if (matchingWishlistItems.length > 0) {
+        return true
+      }
+    }
+
+    return false
+  }
+
   return (
-    <Modal size="small" isOpen={isOpen} close={close}>
+    <Modal
+      size="small"
+      isOpen={isOpen}
+      close={() => {
+        close()
+        reset()
+      }}
+    >
       <Modal.Title>Choose Wishlist</Modal.Title>
 
       <Modal.Body>
@@ -64,7 +93,13 @@ const WishlistItemAdd = ({ isOpen, close, variant }: WishlistItemAddProps) => {
                   </option>
                 ))}
             </NativeSelect>
-            <Button>Save</Button>
+            {isProductInWishlist() ? (
+              <div className="bg-red-200 text-red-500 p-3 rounded">
+                Product has been added to wishlist
+              </div>
+            ) : (
+              <Button type="submit">Save</Button>
+            )}
           </form>
           <Link
             href="/account/wishlist"

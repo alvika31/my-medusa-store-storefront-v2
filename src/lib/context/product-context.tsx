@@ -16,7 +16,6 @@ import { useStore } from "./store-context"
 import { PricedProduct } from "@medusajs/medusa/dist/types/pricing"
 import { useCreateWishlistItem } from "@lib/hooks/use-create-wishlist-item"
 import { useFetchWishlist } from "@lib/hooks/use-wishlist"
-import { error } from "console"
 
 interface wishlistItemInfoProps {
   wishlist_name_id: string
