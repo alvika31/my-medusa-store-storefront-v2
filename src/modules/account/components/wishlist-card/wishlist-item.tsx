@@ -50,7 +50,9 @@ const WishlistItem = ({ wishlist }: any) => {
                     <p className="text-xs font-medium">
                       {item?.variant?.product?.title}
                     </p>
-                    <LineItemOptions variant={item?.variant} />
+                    {item?.variant && (
+                      <LineItemOptions variant={item?.variant} />
+                    )}
 
                     {item.variant?.prices.map((price: any, index: number) => {
                       const matchingRegion = regions?.find(
